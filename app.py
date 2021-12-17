@@ -4,6 +4,14 @@ import streamlit as st
 from datetime import date, timedelta
 import yfinance as yf
 import plotly.graph_objects as go
+from google.oauth2 import service_account
+from google.cloud import bigquery
+
+# API client
+credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"]
+)
+client = bigquery.Client(credentials=credentials)
 
 st.title('Stock Price Prediction')
 
@@ -22,7 +30,11 @@ end_date = st.date_input('Enter end date:', today, max_value=today, min_value=fi
 # predict for x days future INSTEAD OF a single day???
 
 # load stock price from yahoo
-df = yf.download(stock, start_date, end_date)
+@st.cache(ttl=600)
+def get_stock(s, s_date, e_date):
+    return yf.download(s, s_date, e_date)
+
+df = get_stock(stock, start_date, end_date)
 df.index = df.index.date
 if st.checkbox('Show stock price dataframe'):
     st.write(df)
@@ -33,13 +45,25 @@ if st.checkbox('Show stock price dataframe'):
 # date_range = (df['Date'] > start_date) & (pred_df['Date'] <= end_date)
 # df = df.loc[date_range]
 
-#TODO: load tweets/news data
-
 #TODO: load predicted data
-pred_df = pd.read_csv('predictions.csv')[['Date', 'Predictions']]
-pred_df['Date'] = pd.to_datetime(pred_df.Date, format='%Y-%m-%d').dt.date
-date_range = (pred_df['Date'] >= start_date) & (pred_df['Date'] < end_date)
-pred_df = pred_df.loc[date_range]
+@st.cache(ttl=600)
+def query_predicted(query):
+    query_job = client.query(query)
+    rows_raw = query_job.result()
+    rows = [dict(row) for row in rows_raw]
+    return rows
+
+pred_df = query_predicted(
+    "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Date between {} AND {} ORDER BY Date;".format(start_date, end_date)
+)
+pred_df
+# pred_df = pd.read_csv('predictions.csv')[['Date', 'Predictions']]
+# pred_df['Date'] = pd.to_datetime(pred_df.Date, format='%Y-%m-%d').dt.date
+# date_range = (pred_df['Date'] >= start_date) & (pred_df['Date'] < end_date)
+# pred_df = pred_df.loc[date_range]
+
+
+#TODO: load tweets/news data
 
 # st.subheader('Data Overview')
 # st.write(df.describe())
