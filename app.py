@@ -59,7 +59,6 @@ def make_query(query):
 pred_df = make_query(
     "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
 )
-pred_df
 # pred_df = pd.read_csv('predictions.csv')[['Date', 'Predictions']]
 # pred_df['Date'] = pd.to_datetime(pred_df.Date, format='%Y-%m-%d').dt.date
 # date_range = (pred_df['Date'] >= start_date) & (pred_df['Date'] < end_date)
