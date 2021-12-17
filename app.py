@@ -53,12 +53,12 @@ def make_query(query):
     # rows_raw = query_job.result()
     # rows = [dict(row) for row in rows_raw]
     # return rows
-    pandas_gbq.read_gbq(query, credentials=credentials)
+    return pandas_gbq.read_gbq(query, credentials=credentials)
+
 
 pred_df = make_query(
-    "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Date between '{}' AND '{}' ORDER BY Date;".format(start_date, end_date)
+    "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
 )
-# pred_df = pd.DataFrame.from_dict(pred, orient='index')
 pred_df
 # pred_df = pd.read_csv('predictions.csv')[['Date', 'Predictions']]
 # pred_df['Date'] = pd.to_datetime(pred_df.Date, format='%Y-%m-%d').dt.date
@@ -71,7 +71,7 @@ pred_df
 # st.subheader('Data Overview')
 # st.write(df.describe())
 
-# st.subheader('Plot')
+st.subheader('Plot')
 fig, ax = plt.subplots()
 fig = go.Figure(data=[go.Candlestick(x=df.index,
                 open=df['Open'],
@@ -89,13 +89,7 @@ fig.add_trace(
         )
     )
 )
-# ax.plot(df['High'], label='High')
-# ax.plot(df['Low'], label='Low')
-# ax.plot(df['Close'], label='Actual Close')
-# ax.set_xlabel('Date')
-# ax.set_ylabel('$')
-# ax.legend()
-# st.pyplot(fig)
+
 fig.update_layout(xaxis_rangeslider_visible=False,
                   title='Actual vs. Predicted {} stock price'.format(stock),
                   yaxis_title='$',
