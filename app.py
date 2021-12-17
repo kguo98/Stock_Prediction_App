@@ -46,30 +46,24 @@ if st.checkbox('Show stock price dataframe'):
 # date_range = (df['Date'] > start_date) & (pred_df['Date'] <= end_date)
 # df = df.loc[date_range]
 
-#TODO: load predicted data
+#: load predicted price using stock vs all info
 # @st.cache(allow_output_mutation=True, ttl=600)
 def make_query(query):
-    # query_job = client.query(query)
-    # rows_raw = query_job.result()
-    # rows = [dict(row) for row in rows_raw]
-    # return rows
     return pandas_gbq.read_gbq(query, credentials=credentials)
-
 
 pred_df = make_query(
     "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
 )
-# pred_df = pd.read_csv('predictions.csv')[['Date', 'Predictions']]
-# pred_df['Date'] = pd.to_datetime(pred_df.Date, format='%Y-%m-%d').dt.date
-# date_range = (pred_df['Date'] >= start_date) & (pred_df['Date'] < end_date)
-# pred_df = pred_df.loc[date_range]
 
 
-#TODO: load tweets/news data
+tw_pred_df = make_query(
+    "SELECT Date, predicted FROM `sublime-cargo-326805.stockPrediction.tweets_prediction` WHERE company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
+)
 
-# st.subheader('Data Overview')
-# st.write(df.describe())
 
+
+
+# Graph
 st.subheader('Plot')
 fig, ax = plt.subplots()
 fig = go.Figure(data=[go.Candlestick(x=df.index,
@@ -82,9 +76,20 @@ fig.add_trace(
     go.Scatter(
         x=pred_df['Date'],
         y=pred_df['Predictions'],
-        name='Predicted',
+        name='Predicted with stock price',
         line=dict(
             color='yellow'
+        )
+    )
+)
+
+fig.add_trace(
+    go.Scatter(
+        x=tw_pred_df['Date'],
+        y=tw_pred_df['predicted'],
+        name='Predicted with stock price, tweets and financial news',
+        line=dict(
+            color='cyan'
         )
     )
 )
