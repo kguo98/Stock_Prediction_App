@@ -31,7 +31,7 @@ end_date = st.date_input('Enter end date:', today, max_value=today, min_value=fi
 # predict for x days future INSTEAD OF a single day???
 
 # load stock price from yahoo
-@st.cache(ttl=600)
+@st.cache(allow_output_mutation=True, ttl=600)
 def get_stock(s, s_date, e_date):
     return yf.download(s, s_date, e_date)
 
@@ -47,7 +47,7 @@ if st.checkbox('Show stock price dataframe'):
 # df = df.loc[date_range]
 
 #TODO: load predicted data
-@st.cache(ttl=600)
+@st.cache(allow_output_mutation=True, ttl=600)
 def query_predicted(query):
     query_job = client.query(query)
     rows_raw = query_job.result()
@@ -55,7 +55,7 @@ def query_predicted(query):
     return rows
 
 pred_df = query_predicted(
-    "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Date between {} AND {} ORDER BY Date;".format(start_date, end_date)
+    "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Date between '{}' AND '{}' ORDER BY Date;".format(start_date, end_date)
 )
 pred_df
 # pred_df = pd.read_csv('predictions.csv')[['Date', 'Predictions']]
