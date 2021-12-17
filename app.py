@@ -47,7 +47,7 @@ if st.checkbox('Show stock price dataframe'):
 # df = df.loc[date_range]
 
 #TODO: load predicted data
-@st.cache(allow_output_mutation=True, ttl=600)
+# @st.cache(allow_output_mutation=True, ttl=600)
 def make_query(query):
     # query_job = client.query(query)
     # rows_raw = query_job.result()
@@ -55,10 +55,10 @@ def make_query(query):
     # return rows
     pandas_gbq.read_gbq(query, credentials=credentials)
 
-pred = make_query(
+pred_df = make_query(
     "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Date between '{}' AND '{}' ORDER BY Date;".format(start_date, end_date)
 )
-pred_df = pd.DataFrame.from_dict(pred, orient='index')
+# pred_df = pd.DataFrame.from_dict(pred, orient='index')
 pred_df
 # pred_df = pd.read_csv('predictions.csv')[['Date', 'Predictions']]
 # pred_df['Date'] = pd.to_datetime(pred_df.Date, format='%Y-%m-%d').dt.date
