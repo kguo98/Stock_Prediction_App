@@ -53,7 +53,7 @@ def make_query(query):
     # rows_raw = query_job.result()
     # rows = [dict(row) for row in rows_raw]
     # return rows
-    pandas_gbq.read_gbq(query, project_id='sublime-cargo-326805', credentials=credentials)
+    pandas_gbq.read_gbq(query, credentials=credentials)
 
 pred = make_query(
     "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Date between '{}' AND '{}' ORDER BY Date;".format(start_date, end_date)
