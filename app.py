@@ -56,7 +56,7 @@ def query_predicted(query):
 pred = query_predicted(
     "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Date between '{}' AND '{}' ORDER BY Date;".format(start_date, end_date)
 )
-pred_df = pd.DataFrame.from_dict(pred_df, orient='index')
+pred_df = pd.DataFrame.from_dict(pred, orient='index')
 pred_df
 # pred_df = pd.read_csv('predictions.csv')[['Date', 'Predictions']]
 # pred_df['Date'] = pd.to_datetime(pred_df.Date, format='%Y-%m-%d').dt.date
