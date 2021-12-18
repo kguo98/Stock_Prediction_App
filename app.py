@@ -91,7 +91,7 @@ fig.add_trace(
     go.Scatter(
         x=multi_pred_df['Date'],
         y=multi_pred_df['Close'],
-        name='Predicted with all',
+        name='Predicted with all data',
         line=dict(
             color='cyan'
         )
