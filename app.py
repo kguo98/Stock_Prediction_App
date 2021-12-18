@@ -28,6 +28,7 @@ five_days_before = today - timedelta(days=5)
 five_years_before = today - timedelta(days=1825)
 start_date = st.date_input('Enter start date:', five_days_before, max_value=today-timedelta(days=1), min_value=five_years_before)
 end_date = st.date_input('Enter end date:', today, max_value=today, min_value=five_years_before+timedelta(days=60))
+five_days_after = end_date + timedelta(days=5)
 
 
 # load stock price from yahoo
@@ -46,7 +47,7 @@ if st.checkbox('Show stock price dataframe'):
 # date_range = (df['Date'] > start_date) & (pred_df['Date'] <= end_date)
 # df = df.loc[date_range]
 
-#: load predicted price using stock vs all info
+#: load predicted price using stock vs all info from BQ
 # @st.cache(allow_output_mutation=True, ttl=600)
 def make_query(query):
     return pandas_gbq.read_gbq(query, credentials=credentials)
@@ -55,9 +56,12 @@ pred_df = make_query(
     "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
 )
 
+# tw_pred_df = make_query(
+#     "SELECT Date, predicted FROM `sublime-cargo-326805.stockPrediction.tweets_prediction` WHERE company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
+# )
 
-tw_pred_df = make_query(
-    "SELECT Date, predicted FROM `sublime-cargo-326805.stockPrediction.tweets_prediction` WHERE company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
+multi_pred_df = make_query(
+    "SELECT Date, Close FROM `sublime-cargo-326805.stockPrediction.multi-forcast` WHERE company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, five_days_after)
 )
 
 
@@ -76,7 +80,7 @@ fig.add_trace(
     go.Scatter(
         x=pred_df['Date'],
         y=pred_df['Predictions'],
-        name='Predicted with stock price',
+        name='Predicted with only stock price',
         line=dict(
             color='yellow'
         )
@@ -85,9 +89,9 @@ fig.add_trace(
 
 fig.add_trace(
     go.Scatter(
-        x=tw_pred_df['Date'],
-        y=tw_pred_df['predicted'],
-        name='Predicted with stock price, tweets and financial news',
+        x=multi_pred_df['Date'],
+        y=multi_pred_df['Close'],
+        name='Predicted with all',
         line=dict(
             color='cyan'
         )
