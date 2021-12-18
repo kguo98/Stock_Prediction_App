@@ -37,7 +37,7 @@ def get_stock(s, s_date, e_date):
     return yf.download(s, s_date, e_date)
 
 df = get_stock(stock, start_date, end_date)
-df.index = df.index.date
+# df.index = df.index.date
 if st.checkbox('Show stock price dataframe'):
     st.write(df)
 
