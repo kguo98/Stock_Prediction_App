@@ -53,7 +53,7 @@ def make_query(query):
     return pandas_gbq.read_gbq(query, credentials=credentials)
 
 pred_df = make_query(
-    "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.prediction` WHERE Company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
+    "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.tw-pred` WHERE Company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
 )
 
 # tw_pred_df = make_query(
@@ -80,7 +80,7 @@ fig.add_trace(
     go.Scatter(
         x=pred_df['Date'],
         y=pred_df['Predictions'],
-        name='Predicted with only stock price',
+        name='prediction made with tweets',
         line=dict(
             color='yellow'
         )
@@ -91,7 +91,7 @@ fig.add_trace(
     go.Scatter(
         x=multi_pred_df['Date'],
         y=multi_pred_df['Close'],
-        name='Predicted with all data',
+        name='5 days predictions from LSTM',
         line=dict(
             color='cyan'
         )
