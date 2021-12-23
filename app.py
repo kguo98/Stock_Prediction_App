@@ -79,7 +79,7 @@ fig = go.Figure(data=[go.Candlestick(x=df.index,
 fig.add_trace(
     go.Scatter(
         x=pred_df['Date'],
-        y=pred_df['Predictions'],
+        y=pred_df['predicted'],
         name='prediction made with tweets',
         line=dict(
             color='yellow'
