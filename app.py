@@ -53,7 +53,7 @@ def make_query(query):
     return pandas_gbq.read_gbq(query, credentials=credentials)
 
 pred_df = make_query(
-    "SELECT Date, Predictions FROM `sublime-cargo-326805.stockPrediction.tw-pred` WHERE company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
+    "SELECT Date, predicted FROM `sublime-cargo-326805.stockPrediction.tw-pred` WHERE company = '{}' AND Date between '{}' AND '{}' ORDER BY Date;".format(stock, start_date, end_date)
 )
 
 # tw_pred_df = make_query(
